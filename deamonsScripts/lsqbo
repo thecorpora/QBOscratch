@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Para listar los procesoso de Qbo que se están ejecutando: (lsqbo.sh)
+ps -aux | grep -v grep | grep -e PiCmdLine.py -e listen.py -e websocket_server -e PiCmd.py -e feel.py -e say
+

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#busca un proceso especifico
+DATO=`ps -aux | grep -v grep | grep websocket_server`
+if [ -z "$DATO" ]; then
+    	EXISTE=false
+else
+	EXISTE=true
+fi
+
+START="start"
+STOP="stop"
+
+# echo "EXISTE: " $EXISTE
+# start websocket server
+if [[ $1 = $START ]]; then
+	if $EXISTE = true;
+	then
+		echo "websocket_server is already running"
+	else
+		echo "launching websocket_server"
+		/home/pi/Documents/websocketServer/websocket_server&
+	fi
+fi
+
+# stop websocket server
+if [[ $1 = $STOP ]];
+then
+	if $EXISTE = true;
+	then
+		kill -9 `ps -ef |grep -v grep |grep websocket_server| awk '{print $2}'`
+		echo "webserver_socket stoped"
+	else
+		echo "webserver_socket was not running"
+	fi
+fi

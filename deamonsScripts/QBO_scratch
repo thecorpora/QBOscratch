@@ -1,0 +1,33 @@
+#!/bin/bash
+
+START="start"
+STOP="stop"
+
+if [[ $1 = $START ]]; then
+	# start all qbo process for scratch control
+	echo "starting websocket server..."
+	/home/pi/Documents/deamonsScripts/QBO_server start
+	echo "starting PiCmd.py ..."
+	/home/pi/Documents/deamonsScripts/QBO_PiCmd start
+	echo "starting say.py..."
+	/home/pi/Documents/deamonsScripts/QBO_say start
+	echo "starting listen.py..."
+	/home/pi/Documents/deamonsScripts/QBO_listen start
+	echo "starting feel.py..."
+	/home/pi/Documents/deamonsScripts/QBO_feel start
+fi
+
+if [[ $1 = $STOP ]];  then
+	# stop all qbo process for scratch control
+        echo "stoping websocket server..."
+        /home/pi/Documents/deamonsScripts/QBO_server stop
+        echo "stoping PiCmd.py ..."
+        /home/pi/Documents/deamonsScripts/QBO_PiCmd stop
+        echo "stoping say.py..."
+        /home/pi/Documents/deamonsScripts/QBO_say stop
+        echo "stoping listen.py..."
+        /home/pi/Documents/deamonsScripts/QBO_listen stop
+        echo "stoping feel.py..."
+        /home/pi/Documents/deamonsScripts/QBO_feel stop
+fi
+

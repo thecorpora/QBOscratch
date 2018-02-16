@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#busca un proceso especifico
+DATO=`ps -aux | grep -v grep | grep feel.py`
+if [ -z "$DATO" ]; then
+    	EXISTE=false
+else
+	EXISTE=true
+fi
+
+START="start"
+STOP="stop"
+
+# echo "EXISTE: " $EXISTE
+# start say.py
+if [[ $1 = $START ]]; then
+	if $EXISTE = true;
+	then
+		echo "feel.py is already running"
+	else
+		echo "launching feel.py"
+		/home/pi/Documents/Python\ projects/feel.py > /dev/null &
+	fi
+fi
+
+# stop PiCmd
+if [[ $1 = $STOP ]];
+then
+	if $EXISTE = true;
+	then
+		kill -9 `ps -ef |grep -v grep |grep feel.py| awk '{print $2}'`
+		echo "feel.py stoped"
+	else
+		echo "feel.py was not running"
+	fi
+fi
