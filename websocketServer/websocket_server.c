@@ -29,6 +29,7 @@ char * fifo_say = "/home/pi/Documents/pipes/pipe_say";
 char * fifo_cmd = "/home/pi/Documents/pipes/pipe_cmd";
 char * fifo_listen = "/home/pi/Documents/pipes/pipe_listen";
 char * fifo_feel = "/home/pi/Documents/pipes/pipe_feel";
+char * fifo_findFace = "/home/pi/Documents/pipes/pipe_findFace";
 
 
 /* *
@@ -109,6 +110,31 @@ void* inspect_PIPE_FEEL(void *arg)
 
     if (nread) {
 	sprintf(strTextToSend, "%s", listen_buff);
+	websocket_write_back(wsi_p ,(char *)strTextToSend, -1);
+    }
+  }
+}
+
+
+/* inspect PIPE FIND FACE thread*/
+void* inspect_PIPE_FIND_FACE(void *arg)
+{
+  char strTextToSend[1024];
+  char listen_buff[1024];
+  int nread, fd;
+  
+  while (1) {
+    sleep(1);
+    memset(listen_buff, 0, 1024);
+    /* read text from the FIFO_FIND_FACE */
+    printf("opening %s\n", fifo_findFace);
+    fd = open(fifo_findFace, O_RDONLY);
+    nread = read(fd, listen_buff, 1024);
+    printf ("From FIFO_FIND_FACE: %s\n", listen_buff);
+    close(fd);
+
+    if (nread) {
+	sprintf(strTextToSend, "Face: %s", listen_buff);
 	websocket_write_back(wsi_p ,(char *)strTextToSend, -1);
     }
   }
@@ -264,6 +290,13 @@ int main(void) {
     printf("\ncan't create thread :[%s]", strerror(err));
   else
   printf("\n Thread PIPE_FEEL created successfully\n");
+
+  // create inspect PIPE FIND_FACE thread
+  err = pthread_create(&tid_2, NULL, &inspect_PIPE_FIND_FACE, NULL);
+  if (err != 0)
+    printf("\ncan't create thread :[%s]", strerror(err));
+  else
+    printf("\n Thread PIPE_FIND_FACE created successfully\n");
 
 
   //* websocket service */
