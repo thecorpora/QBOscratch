@@ -10,6 +10,9 @@ new (function() {
     var voice = "english"
     var textListen = "";
     var textTouch = "";
+    var textFace = "";
+    var faceCoord_x = 0;
+    var faceCoord_y = 0;
 
     //    var touch_left = false, touch_right = false;
 
@@ -37,22 +40,30 @@ new (function() {
 		connected= true;			
 		console.log('Connection open!');
 		connection.send('Hey server, whats up?');
-	//	setInterval ( function() { connection.send('get status'); }, 1000 );
+		//	setInterval ( function() { connection.send('get status'); }, 1000 );
 		callback();
 	    }
 	    connection.onmessage = function(e){
 		var server_message = e.data;
+	
 		console.log('server response: ' + server_message);
 		if (server_message.startsWith("Text:")) {
-			textListen = server_message.substr(6, server_message.length);
-			textListen = textListen.substr(0, textListen.length);
-			console.log('TEXTLISTEN: ' + textListen);
+		    textListen = server_message.substr(6, server_message.length);
+		    textListen = textListen.substr(0, textListen.length);
+		    console.log('TEXTLISTEN: ' + textListen);
 		}
 		if (server_message.startsWith("Touch:")) {
-			textTouch = server_message.substr(7, server_message.length);
-			textTouch = textTouch.substr(0, textTouch.length);
-			console.log('TEXTTOUCH: ' + textTouch);
-		}    
+		    textTouch = server_message.substr(7, server_message.length);
+		    textTouch = textTouch.substr(0, textTouch.length);
+		    console.log('TEXTTOUCH: ' + textTouch);
+		}
+		if (server_message.startsWith("Face:")) {
+		    textFace = server_message.substr(6, server_message.length);
+		    var res = textFace.split(",");
+		    faceCoord_x = parseInt(res[0]);
+		    faceCoord_y = parseInt(res[1]);
+		    console.log('faceCoord: ' + faceCoord_x + ',' + faceCoord_y);
+		}
 	    }
 	} 
 	else {
@@ -63,73 +74,83 @@ new (function() {
 	}
     };
     
-	
+    
     ext.rotate = function(direction, degrees, callback) {
-		switch (direction) {
-		case 'up':
-			connection.send('-c servo -x 2 -a ' + degrees + ' -s ' + speed);
-			break;
-		case 'down':
-			connection.send('-c servo -x 2 -a ' + degrees + ' -s ' + speed);
-			break;
-		case 'left':
-			connection.send('-c servo -x 1 -a ' + degrees + ' -s ' + speed);
-			break;
-		case 'right':
-			connection.send('-c servo -x 1 -a ' + degrees + ' -s ' + speed);
-			break;
-		default:
-			break;
-		}
-		//callback();
+	switch (direction) {
+	case 'up':
+	    connection.send('-c servo -x 2 -a ' + degrees + ' -s ' + speed);
+	    break;
+	case 'down':
+	    connection.send('-c servo -x 2 -a ' + degrees + ' -s ' + speed);
+	    break;
+	case 'left':
+	    connection.send('-c servo -x 1 -a ' + degrees + ' -s ' + speed);
+	    break;
+	case 'right':
+	    connection.send('-c servo -x 1 -a ' + degrees + ' -s ' + speed);
+	    break;
+	default:
+	    break;
+	}
+	//callback();
     };
 
     ext.set_rotate_speed = function(speed_value, callback) {
-		speed = speed_value;
-		callback();
+	speed = speed_value;
+	callback();
     };
     
     ext.say = function(text, callback) {
-		connection.send('-c say -t "' + text + '"');
-		callback();
+	connection.send('-c say -t "' + text + '"');
+	callback();
     };
 
     ext.nose_color = function(text, callback) {
-		connection.send('-c nose -co ' + text);
-		callback();
+	connection.send('-c nose -co ' + text);
+	callback();
     };
-	
+    
     ext.mouthExpression = function(expression, callback) {
-		connection.send('-c mouth -e ' + expression);
-		console.log('mouth: ' + expression);
-		callback();
+	connection.send('-c mouth -e ' + expression);
+	console.log('mouth: ' + expression);
+	callback();
     };
 
 
     ext.voice = function(text, callback) {
-		connection.send('-c voice -l ' + text);
-		callback();
+	connection.send('-c voice -l ' + text);
+	callback();
     };
     
     ext.is_connected = function(callback) {
-		return connected;
+	return connected;
     }; 
 
     ext.when_listen = function(text) {
 	if (text == textListen) {
-		textListen = "";
-		return true;
+	    textListen = "";
+	    return true;
 	}
 	return false;
     };
-	
-	
+    
+    ext.when_seeFace = function() {
+	console.log('faceCoord into: ' + faceCoord_x + ',' + faceCoord_y);
+	if (faceCoord_x != 0 || faceCoord_y != 0) {
+	    faceCoord_x = 0;
+	    faceCoord_y = 0;
+	    console.log("face DETECTED!")
+	    return true;
+	}
+	return false;
+    };
+    
     ext.is_touch = function(zone) {
 	if (textTouch == zone) {
-		textTouch = "";
-		return true;
+	    textTouch = "";
+	    return true;
 	}
-		
+	
 	
 	return false;
     };
@@ -147,22 +168,23 @@ new (function() {
     var descriptor = {
         blocks: [
             ['w', 'Connect ip: %s port: %n', 'connect', '169.254.98.67', 51717],
-			['w', 'Say %s', 'say', 'I am connected!'],
-			['w', 'Nose color: %m.noseColor', 'nose_color', 'red'],
-			['w', 'Voice: %m.voice', 'voice', 'english'],
-			[' ', 'rotate direction:%m.motorDirection degrees:%nº', 'rotate', 'right', 511],
-			['w', 'set rotate speed %n', 'set_rotate_speed', 100],
-			['w', 'Mouth: %m.expression', 'mouthExpression', 'smile'],
-			['b', 'is connected', 'is_connected'],
-			['h', 'when touch %m.touchZone', 'is_touch', 'up'],
-			['h', 'when listen %s', 'when_listen', 'hello'],
-			['h', 'when message received', 'message_received'],
+	    ['w', 'Say %s', 'say', 'I am connected!'],
+	    ['w', 'Nose color: %m.noseColor', 'nose_color', 'red'],
+	    ['w', 'Voice: %m.voice', 'voice', 'english'],
+	    [' ', 'rotate direction:%m.motorDirection degrees:%nÂº', 'rotate', 'right', 511],
+	    ['w', 'set rotate speed %n', 'set_rotate_speed', 100],
+	    ['w', 'Mouth: %m.expression', 'mouthExpression', 'smile'],
+	    ['b', 'is connected', 'is_connected'],
+	    ['h', 'when touch %m.touchZone', 'is_touch', 'up'],
+	    ['h', 'when listen %s', 'when_listen', 'hello'],
+	    ['h', 'when see a face', 'when_seeFace'],
+	    ['h', 'when message received', 'message_received'],
 	],
 	menus: {
             motorDirection: ['right', 'up'],
             touchZone: ['left', 'right', 'up'],
 	    noseColor: ['red', 'green', 'blue'],
-		expression: ['smile', 'sad', 'serious', 'love'],
+	    expression: ['smile', 'sad', 'serious', 'love'],
 	    voice: ['english', 'spanish'],        	
 	    lessMore: ['<', '>'],
             eNe: ['=','not =']
