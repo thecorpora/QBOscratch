@@ -74,25 +74,54 @@ new (function() {
 	}
     };
     
-    
     ext.rotate = function(direction, degrees, callback) {
+	// from degrees to position
+	var position;
+	    
 	switch (direction) {
 	case 'up':
-	    connection.send('-c servo -x 2 -a ' + degrees + ' -s ' + speed);
+	    position = parseInt(degrees / 0.29 + 550);
+	    connection.send('-c servo -x 2 -a ' + position + ' -s ' + speed);
 	    break;
 	case 'down':
-	    connection.send('-c servo -x 2 -a ' + degrees + ' -s ' + speed);
+	    position = parseInt(-degrees / 0.29 + 550);
+	    connection.send('-c servo -x 2 -a ' + position + ' -s ' + speed);
 	    break;
 	case 'left':
-	    connection.send('-c servo -x 1 -a ' + degrees + ' -s ' + speed);
+	    position = parseInt(-degrees / 0.29 + 511);
+	    connection.send('-c servo -x 1 -a ' + position + ' -s ' + speed);
 	    break;
 	case 'right':
-	    connection.send('-c servo -x 1 -a ' + degrees + ' -s ' + speed);
+	    position = parseInt(degrees / 0.29 + 511);
+	    connection.send('-c servo -x 1 -a ' + position + ' -s ' + speed);
 	    break;
 	default:
 	    break;
 	}
-	//callback();
+	callback();
+    };
+
+    ext.relative_movement = function(direction, degrees, callback) {
+	// from degrees to position
+	var position = parseInt(degrees / 0.29);
+
+	switch (direction) {
+	case 'up':
+	    connection.send('-c move_rel -x 2 -a ' + position);
+	    break;
+	case 'down':
+	    connection.send('-c move_rel -x 2 -a -' + position);
+	    break;
+	case 'left':
+	    connection.send('-c move_rel -x 1 -a -' + position);
+	    break;
+	case 'right':
+	    connection.send('-c move_rel -x 1 -a ' + position);
+	    break;
+	default:
+	    break;
+	}
+	callback();
     };
 
     ext.set_rotate_speed = function(speed_value, callback) {
@@ -171,7 +200,8 @@ new (function() {
 	    ['w', 'Say %s', 'say', 'I am connected!'],
 	    ['w', 'Nose color: %m.noseColor', 'nose_color', 'red'],
 	    ['w', 'Voice: %m.voice', 'voice', 'english'],
-	    [' ', 'rotate direction:%m.motorDirection degrees:%nº', 'rotate', 'right', 511],
+	    ['w', 'rotate direction:%m.motorDirection degrees:%nº', 'rotate', 'right', 511],
+	    ['w', 'relative movement:%m.motorDirection degrees:%nº', 'relative_movement', 'right', 0],
 	    ['w', 'set rotate speed %n', 'set_rotate_speed', 100],
 	    ['w', 'Mouth: %m.expression', 'mouthExpression', 'smile'],
 	    ['b', 'is connected', 'is_connected'],
@@ -181,7 +211,7 @@ new (function() {
 	    ['h', 'when message received', 'message_received'],
 	],
 	menus: {
-            motorDirection: ['right', 'up'],
+            motorDirection: ['left', 'right', 'up', 'down'],
             touchZone: ['left', 'right', 'up'],
 	    noseColor: ['red', 'green', 'blue'],
 	    expression: ['smile', 'sad', 'serious', 'love'],
