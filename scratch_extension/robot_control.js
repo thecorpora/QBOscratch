@@ -164,7 +164,6 @@ new (function() {
     };
     
     ext.when_seeFace = function() {
-	console.log('faceCoord into: ' + faceCoord_x + ',' + faceCoord_y);
 	if (faceCoord_x != 0 || faceCoord_y != 0) {
 	    faceCoord_x = 0;
 	    faceCoord_y = 0;
