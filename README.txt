@@ -1,7 +1,7 @@
 Para actualizar el control por Scratch:
 
 1.- Copiar los archivos del directorio "Python projects" dentro de "/home/pi/Documents/Python projects"
-	Dar permisos de ejecuci髇 a los archivos python:
+	Dar permisos de ejecuci贸n a los archivos python:
 		cd Python\ projects
 		chmod 777 *.py
 
@@ -11,11 +11,11 @@ Para actualizar el control por Scratch:
 		chmod 777 websocket_server
 
 3.- Copiar el directorio "deamonsScrpits" a "/home/pi/Documents"
-	Dar permiso de ejecuci髇 a los scrpits de "deamonsScrpits":
+	Dar permiso de ejecuci贸n a los scrpits de "deamonsScrpits":
 		cd deamonsScripts
 		chmod 777 *
 
-4.- Crear un directorio para las pipes de comunicaci髇 interna.
+4.- Crear un directorio para las pipes de comunicaci贸n interna.
 	mkdir /home/pi/Documents/pipes
 
 5.- Ejecutar el script de inicio del control Scratch, para arrancar los 5 deamons necesarios:
@@ -23,9 +23,9 @@ Para actualizar el control por Scratch:
 	./QBO_scratch start
     Para detener todos los procesos asociados al control Scratch:
 	./QBO_scratch stop
-    Para comrpobar los procesos que se est醤 ejecutando:
+    Para comrpobar los procesos que se est谩n ejecutando:
 	./lsqbo
     Tiene que haber 5 procesos:  websocket_server, listen, say, PiCmd y feel
 
-6.- Abrir el navegador y entrar la siguiente direcci髇:
-	http://scratchx.org/?url=https://rperaltadiaz.github.io/Qbo/robot_control.js#scratch
+6.- Abrir el navegador y entrar la siguiente direcci贸n:
+	http://scratchx.org/?url=https://thecorpora.github.io/QBOscratch/scratch_extension/robot_control.js#scratch
