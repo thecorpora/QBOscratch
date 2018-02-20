@@ -130,13 +130,18 @@ void* inspect_PIPE_FIND_FACE(void *arg)
     printf("opening %s\n", fifo_findFace);
     fd = open(fifo_findFace, O_RDONLY);
     nread = read(fd, listen_buff, 1024);
-    printf ("From FIFO_FIND_FACE: %s\n", listen_buff);
-    close(fd);
-
-    if (nread) {
+    if (nread > 0) {
+	printf ("From FIFO_FIND_FACE: %s\n", listen_buff);
 	sprintf(strTextToSend, "Face: %s", listen_buff);
 	websocket_write_back(wsi_p ,(char *)strTextToSend, -1);
     }
+    close(fd);
+    // read all the pipe.
+    if (nread > 0) {
+	fd = open(fifo_findFace, O_RDONLY | O_NONBLOCK);
+	nread = read(fd, listen_buff, 1024);
+    }
+    close(fd);
   }
 }
 
