@@ -2,6 +2,7 @@
 
 
 from multiprocessing import Process, Queue
+import subprocess
 import time
 import fileinput
 import thread
@@ -32,6 +33,7 @@ lang = ""
 ser=""
 matrix = 0
 expression = ""
+youtube_code = ""
 
 # # thread function (NOT USED)
 # def dispach_UI():
@@ -150,7 +152,7 @@ def get_languaje():
                 print "laguaje param error"
 
 def get_mouth_expression():
-        global expression
+	global expression
 
         try:
                 arg = scan_argument(idx)
@@ -162,6 +164,9 @@ def get_mouth_expression():
         except:
                 print "expression param error"
 
+def get_youtube_code():
+        global youtube_code
+	youtube_code = scan_argument(idx)
 
 def get_mouth_matrix():
 	global matrix
@@ -268,8 +273,9 @@ def CommandOK_Action():
 				HeadServo.SetMouth(0x1B1F0E04)
 	elif cmd == "listen":
 		listen_thd = Qbo.StartBack()
+	elif cmd == "youtube":
+		result = subprocess.call("youtube-dl --extract-audio --audio-format wav -o \"cancion.%(ext)s\" https://www.youtube.com/watch?v=" + youtube_code + " ; aplay cancion.wav -D convertQBO", shell = True)
                 
-
 	else:
                 print "Command error. Type ? to help"
 
@@ -283,6 +289,7 @@ options = {"-c"  : get_command,
            "-l"  : get_languaje,
 	   "-m"  : get_mouth_matrix,
 	   "-e"  : get_mouth_expression,
+	   "-y"  : get_youtube_code,
            "?" : help,
            "help" : help,
            "-h" : help,
@@ -294,6 +301,7 @@ commands = {"servo",
             "voice",
 	    "mouth",
 	    "listen",
+	    "youtube",
 }
 
 
@@ -382,6 +390,7 @@ if len(sys.argv) == 1:
 	                color = ""
 			matrix = 0
 			expression = ""
+			youtube_code = ""
 
 	                # escanea los argumentos de la linea de comandos
 	                for word in line.split():
