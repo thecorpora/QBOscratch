@@ -11,7 +11,7 @@ import time
 
 class QBOtalk:
     def __init__(self):
-        CLIENT_ACCESS_TOKEN = '3f738f7e64d24d51b126f442b1513d7a'
+        CLIENT_ACCESS_TOKEN = 'YOUR_APIAI_TOKEN'
         # obtain audio from the microphone
         self.r = sr.Recognizer()
         self.ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN)
