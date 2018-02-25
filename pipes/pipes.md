@@ -1,1 +1,2 @@
-Here will be the named pipes to interprocess comunication.
+# pipes directory
+Here will be the **named pipes** to interprocess comunication.
