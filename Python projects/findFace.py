@@ -56,7 +56,8 @@ except OSError as oe:
 
 fr_time = 0
 while True:
-	print "frame time: " + str(time.time() - fr_time)
+#	print "frame time: " + str(time.time() - fr_time)
+	time.sleep(0.5) # capture image every 500ms
 	fr_time = time.time()
 
 	faceFound = False       # This variable is set to true if, on THIS loop a face has already been found
@@ -68,10 +69,10 @@ while True:
                         while time.time()-t_ini < 0.01: # wait for present frame
 				t_ini = time.time()
 				aframe = webcam.read()[1]       #       there seems to be an issue in OpenCV or V4L or my webcam-
-				print "t: " + str(time.time()-t_ini)
+#				print "t: " + str(time.time()-t_ini)
                         fface = frontalface.detectMultiScale(aframe,1.3,4,(cv2.cv.CV_HAAR_DO_CANNY_PRUNING + cv2.cv.CV_HAAR_FIND_BIGGEST_OBJECT + cv2.cv.CV_HAAR_DO_ROUGH_SEARCH),(60,60))
                         if fface != ():                 # if we found a frontal face...
-				print "FAAACEEEE"
+#				print "FAAACEEEE"
                                 lastface = 1            # set lastface 1 (so next loop we will only look for a frontface)
                                 for f in fface:         # f in fface is an array with a rectangle representing a face
                                         faceFound = True
@@ -83,11 +84,11 @@ while True:
                         while time.time()-t_ini < 0.01: # wait for present frame
 				t_ini = time.time()
 				aframe = webcam.read()[1]       #       there seems to be an issue in OpenCV or V4L or my webcam-
-				print "tp: " + str(time.time()-t_ini)
+#				print "tp: " + str(time.time()-t_ini)
                         pfacer = profileface.detectMultiScale(aframe,1.3,4,(cv2.cv.CV_HAAR_DO_CANNY_PRUNING + cv2.cv.CV_HAAR_FIND_BIGGEST_OBJECT + cv2.cv.CV_HAAR_DO_ROUGH_SEARCH),(80,80))
 
                         if pfacer != ():                # if we found a profile face...
-				print "PROFILE FAAACEEEE"
+#				print "PROFILE FAAACEEEE"
                                 lastface = 2
                                 for f in pfacer:
                                         faceFound = True
@@ -102,14 +103,14 @@ while True:
 	                if Facedet != 0:
 	                        Facedet = 0
 	                        no_face_tm = time.time()
-	                        print "No face.!"
+#	                        print "No face.!"
 	                elif(time.time() - no_face_tm > 10):
 	                        Cface[0] = [0,0]
 	                        no_face_tm = time.time()
         else:
                 x,y,w,h = face
                 Cface = [(w/2+x),(h/2+y)]       # we are given an x,y corner point and a width and height, we need the center
-		print "face ccord: " + str(Cface[0]) + "," + str(Cface[1])
+#		print "face ccord: " + str(Cface[0]) + "," + str(Cface[1])
 		fifo = os.open(FIFO_findFace, os.O_WRONLY)
                 os.write(fifo, str(Cface[0]) + "," + str(Cface[1]) + "\n")
                 if Facedet == 0:

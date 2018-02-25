@@ -9,19 +9,23 @@ class Command:
         self.cmd = command
         self.Inputs = nInputs
         self.data_bytes = Data
-    
+
 class Controller:
     def __init__(self, serial):
         self.port = serial
         self.port.timeout = 1.0
-        
+
     INPUT_FLAG =  0xFF
     OUTPUT_FLAG = 0xFE
     INPUT_ESCAPE = 0xFD
     GET_VERSION = 0x40
-    SET_MOUTH_VALUE = 0x44      
+    SET_MOUTH_VALUE = 0x44
     SET_STATE = 0x45
-    SET_SERVO = 0x53            
+    SET_SERVO = 0x53
+    SET_SERVO_PID = 0x50
+    SET_SERVO_ANGLE = 0x71
+    SET_SERVO_SPEED = 0x72
+    SET_SERVO_ANGLE_REL = 0x73
 
 
 # Commands definions :('NAME',value, number of set params, number of get params)
@@ -42,6 +46,7 @@ class Controller:
         "SET_SERVO_LED": (0x51, 2, 0),
         "RESET_SERVO": (0x52, 1, 0),
         "SET_SERVO": (0x53, 5, 0),
+        "SET_SERVO_ANGLE_REL": (0x73, 3, 0),
         "SET_SERVO_ENABLE": (0x54,2, 0),
         "GET_SERVO_SPEED": (0x56, 1, 2),
         "GET_SERVO_LOAD": (0x57, 1, 2),
@@ -55,6 +60,8 @@ class Controller:
         "GET_SERVO_CCW_LIM": (0x5F, 1, 2),
         "GET_SERVO_BYTE_REG": (0x6F, 2, 1),
         "GET_SERVO_WORD_REG": (0x70, 2, 2),
+        "SET_SERVO_ANGLE": (0x71,3,0),
+        "SET_SERVO_SPEED": (0x72,3,0),
         "SET_ADC_REF": (0x81, 1, 0),
         "SET_DAC_REF": (0x82, 1, 0),
         "SET_ADC_OFFSET": (0x83, 6, 0),
@@ -211,6 +218,8 @@ class Controller:
             rxBuffer = self.ReadResponse()
             if len(rxBuffer) >= 5:
                 break
+            else:
+                print "NACK ",rxBuffer
         if len(rxBuffer) < 5:
             print" Error reading response.!"
         rdParam = self.ProcessRxData(rxBuffer)
@@ -244,30 +253,54 @@ class Controller:
 
         for i in range(3, len(tmp_buffer) - 1):
        
-            if  tmp_buffer[i] > self.INPUT_ESCAPE:
+            if  tmp_buffer[i] >= self.INPUT_ESCAPE:
                 tx_buffer.append(self.INPUT_ESCAPE)
                 tx_buffer.append(tmp_buffer[i] - 2)
             else:
                 tx_buffer.append(tmp_buffer[i])
         tx_buffer.append(self.OUTPUT_FLAG)
         databuffer = bytearray(tx_buffer)
-    	print "port.write buffer: " + str(tx_buffer)
         self.port.write(databuffer)
-        self.port.flush()
+#        self.port.flush()
         
         return databuffer
 
-    # Mounts protocol data to set servo position and call sends
+    # Mounts protocol data to set servo position&speed  and call sends
     
     def SetServo(self, Axis, Angle, Speed):
         cmd_buffer = ([ Axis, Angle & 0xff ,  (Angle >>8) & 0xff, Speed & 0xff, (Speed >>8) & 0xff])
         return self.SendCmdQBO(Command(self.SET_SERVO, len(cmd_buffer), cmd_buffer))
+
+    # Mounts protocol data to set QBO position angle
+
+    def SetAngle(self, Axis, Angle):
+        cmd_buffer = ([ Axis, Angle & 0xff ,  (Angle >>8) & 0xff])
+        return self.SendCmdQBO(Command(self.SET_SERVO_ANGLE, len(cmd_buffer), cmd_buffer))
+
+    # Mounts protocol data to set QBO position relative angle
+
+    def SetAngleRelative(self, Axis, Angle):
+        cmd_buffer = ([ Axis, Angle & 0xff ,  (Angle >>8) & 0xff])
+	print "SetAnlgeRelative: (" + str(Axis) + "," + str(Angle) + ")"
+        return self.SendCmdQBO(Command(self.SET_SERVO_ANGLE_REL, len(cmd_buffer), cmd_buffer))
 
     # Mounts protocol data to set QBO nose state color
 
     def SetNoseColor(self, color):
         return self.SendCmdQBO(Command(self.SET_STATE, 1, color & 0xff))
 
+    # Mounts protocol data to set QBO mouth 
+        
     def SetMouth(self, matrix):
-        cmd_buffer = ([(matrix >>24) & 0xff ,  (matrix >>16) & 0xff, (matrix >>8) & 0xff, matrix & 0xff])
-        return self.SendCmdQBO(Command(self.SET_MOUTH_VALUE, 4, cmd_buffer))
+        cmd_buffer = ([(matrix>>24) & 0xff, (matrix>>16) & 0xff, (matrix>>8) & 0xff, matrix & 0xff])
+        return self.SendCmdQBO(Command(self.SET_MOUTH_VALUE, 4, cmd_buffer)) 
+    
+    def SetPid(self, Axis, pid_p, pid_i, pid_d):
+        cmd_buffer = ([Axis, pid_p, pid_i, pid_d])
+	print "SetPid " + str(cmd_buffer)
+        return self.SendCmdQBO(Command(self.SET_SERVO_PID, len(cmd_buffer), cmd_buffer)) 
+    
+
+        
+        
+

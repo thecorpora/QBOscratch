@@ -57,4 +57,5 @@ except OSError as oe:
         raise
 
 while True:
+	time.sleep(1)
         WaitForTouch()

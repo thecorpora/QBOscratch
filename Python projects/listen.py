@@ -15,14 +15,17 @@ import QBOtalk
 
 Qbo = QBOtalk.QBOtalk()
 
-Listenig = True
+Listening = True
 listen_thd = 0
 
 
 def WaitForSpeech():
-        global Listenig, listen_thd, FIFO_listen, FIFO_cmd
-        if Listenig == False:
-                return
+        global Listening, listen_thd, FIFO_listen, FIFO_cmd
+
+	print "WaitForSpeech: Listening=" + str(Listening) + "getAudio=" + str(Qbo.GetAudio)
+        if Listening == False:
+                print "Listening = False"
+		return
         elif Qbo.GetAudio == True:
 #                HeadServo.SetNoseColor(0)       #Off QBO nose brigth
 #		fifo = os.open(FIFO_cmd, os.O_WRONLY)
@@ -33,6 +36,8 @@ def WaitForSpeech():
 		fifo = os.open(FIFO_listen, os.O_WRONLY)
 		os.write(fifo, Qbo.strAudio)
 		os.close(fifo)
+		Qbo.GetAudio = False
+		Listening = False
         return
 
 
@@ -62,7 +67,9 @@ listen_thd = Qbo.StartBackListen()
 
 
 while True:
-        WaitForSpeech()
+        time.sleep(1)
+	WaitForSpeech()
+
         if Qbo.GetAudio == True:
 	    fifo = os.open(FIFO_cmd, os.O_WRONLY)
             os.write(fifo, "-c nose -co red")
@@ -79,3 +86,7 @@ while True:
                 Qbo.GetAudio = False
             except:
                 print("StartBackListe EXCEPTION")
+
+	if Listening == False:
+		listen_thd = Qbo.StartBackListen()
+		Listening = True

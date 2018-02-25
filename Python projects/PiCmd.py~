@@ -32,7 +32,6 @@ lang = ""
 ser=""
 matrix = 0
 expression = ""
-pid = [0, 0, 0]
 
 # # thread function (NOT USED)
 # def dispach_UI():
@@ -50,8 +49,8 @@ def n_args(line):
                 return len(sys.argv)
         else:
                 return len(line.split())
-        
 
+        
 def get_command():
         global cmd
         try:
@@ -60,7 +59,7 @@ def get_command():
                 #        arg = sys.argv[i+1]
                 #else:
                 #        arg = line.split()[i+1]
-
+                        
                 if arg in commands:
                         cmd = str(arg)
                 else:
@@ -68,24 +67,26 @@ def get_command():
         except:
                 print "command param error"
 
-
+        
+        
 def get_angle():
         global angle
         try:
                 arg = scan_argument(idx)
-
-                if int(arg) <= 800 and int(arg) >= -800:
+                        
+                if int(arg) <= 800 and int(arg) >= 200:
                         angle = int(arg)
                 else:
                         print "wrong angle value"
         except:
                 print "wrong angle value"
+        
 
 
 def get_text():
         global text
         global idx
-
+        
         text = ""
         try:
                 while idx < n_args(line):
@@ -99,31 +100,12 @@ def get_text():
         except:
                 print "wrong text value"
 
-def get_pid():
-        global pid
-        global idx
-
-        pid = [0, 0, 0]
-	i = 0
-        try:
-                while idx < n_args(line):
-                        arg = scan_argument(idx)
-
-                        # next command is finded
-                        if arg[0] == '-':
-                                break
-                        idx = idx + 1
-                        pid[i] = int(arg)
-			i += 1
-        except:
-                print "wrong pid value"
-	print "PID: " + str(pid)
 
 def get_axis():
         global axis
 
         arg = scan_argument(idx)
-
+                        
         if arg in axises:
                 axis = int(arg)
         else:
@@ -135,7 +117,7 @@ def get_speed():
         try:
                 arg = scan_argument(idx)
 
-                if int(arg) >= 0 and int(arg) < 2000:
+                if int(arg) > 0 and int(arg) < 2000:
                         speed = int(arg)
                 else:
                         print "wrong speed value"
@@ -147,21 +129,21 @@ def get_color():
 
         try:
                 arg = scan_argument(idx)
-
+                        
                 if arg in colors:
                         color = arg
                 else:
                         print "wrong color value"
         except:
                 print "color param error"
-
+                
 
 def get_languaje():
         global lang
 
         try:
                 arg = scan_argument(idx)
-
+                                    
                 if arg in languages:
                         lang = arg
                 else:
@@ -174,7 +156,7 @@ def get_mouth_expression():
 
         try:
                 arg = scan_argument(idx)
-
+                                    
                 if arg in expressions:
                         expression = arg
                 else:
@@ -189,7 +171,7 @@ def get_mouth_matrix():
 
 	print "GET_MOUTH_MATRIX"
 	print "idx: " + str(idx)
-	try:
+	try:	
 		i = 0
 		while i<4:
 			arg = scan_argument(idx)
@@ -200,12 +182,11 @@ def get_mouth_matrix():
 			idx = idx + 1
 	except:
 		print "mouth matrix param error"
-
+                        
 
 def say():
         print ""
-
-
+        
 def help():
         global cmd
 
@@ -216,7 +197,7 @@ def help():
         print "-a [angle] from -180 to 180"
         print "-x [axis] 1 or 2"
         print "-s [speed] from 1 to 2000"
-        print "-co [color] none, red, green or blue"
+        print "-co [color] red, green or blue"
 	print "-l [languaje] english or spanish"
 	print "-m [matrix] mouth leds matrix"
 	print "-e [expression] smile, sad or serious"
@@ -233,25 +214,19 @@ def CommandOK_Action():
         global HeadServo
 	global color
 
-	FIFO_say = '/home/pi/Documents/pipes/pipe_say';
+	fifo_say = '/home/pi/Documents/pipes/pipe_say';
 
 #    /* create the FIFO (named pipe) */
 #    mkfifo(myfifo, 0666);
 
 
-        if cmd == "servo" and angle != 0 and axis != 0 and speed >= 0:
+        if cmd == "servo" and angle != 0 and axis != 0 and speed != 0:
                 print "Sending: " + cmd + "(" + str(axis) + "," + str(angle) + "," + str(speed) + ")"
 		HeadServo.SetServo(axis, angle, speed)
-        elif cmd == "move" and angle != 0 and axis != 0:
-		HeadServo.SetAngle(axis, angle)
-        elif cmd == "move_rel" and angle != 0 and axis != 0:
-		HeadServo.SetAngleRelative(axis, angle)
-	elif cmd == "nose" and color != "":
+        elif cmd == "nose" and color != "":
                 print "Sending: " + cmd + "(" + str(color) + ")"
                 # se apaga el led de la nariz
                 # llamada al comando "nose"
-                if (color == "none"):
-			HeadServo.SetNoseColor(0)
                 if (color == "red"):
 			HeadServo.SetNoseColor(2)
                 if (color == "blue"):
@@ -260,14 +235,21 @@ def CommandOK_Action():
 			HeadServo.SetNoseColor(4)
         elif cmd == "say" and text != "":
 #		/* write "Hi" to the FIFO */
-	 	print("Opening FIFO..." + FIFO_say)
-		fifo_say = os.open(FIFO_say, os.O_WRONLY)
-		os.write(fifo_say, text)
-		os.close(fifo_say)
-#     		with open(fifo_say, 'w') as fifo:
-#                	print("FIFO opened")
-#			fifo.write(text)		
-#			fifo.close()
+	 	print("Opening FIFO..." + fifo_say)
+     		with open(fifo_say, 'w') as fifo:
+                	print("FIFO opened")
+			fifo.write(text)		
+			fifo.close()
+
+		# llamada de sistema al comando de speech
+#                if config["languaje"] == "english":
+                        # Qbo.SpeechText(text)
+#			os.system("espeak -s 120 '" + text + "'")
+#                elif config["languaje"] == "spanish":
+			# TODO poner dentro de qbo.speechText lo opcion de lenguaje o voz.	
+			# Qbo.SpeechText(text)
+                        # os.system("../scripts/speak_voice.sh '" + text + "'")
+#                        os.system("espeak -v mb-es2 -s 120 '" + text + "' --stdout | aplay -c 1 -D convertQBO -t wav")
                 print "Saying: " + text
         elif cmd == "voice":
 		# actualizacion del fichero config
@@ -290,9 +272,6 @@ def CommandOK_Action():
 				HeadServo.SetMouth(0x1F1F00)
 			elif expression == "love":
 				HeadServo.SetMouth(0x1B1F0E04)
-	elif cmd == "pid":
-		if (axis != 0):
-			HeadServo.SetPid(axis, pid[0], pid[1], pid[2])
 	elif cmd == "listen":
 		listen_thd = Qbo.StartBack()
                 
@@ -310,7 +289,6 @@ options = {"-c"  : get_command,
            "-l"  : get_languaje,
 	   "-m"  : get_mouth_matrix,
 	   "-e"  : get_mouth_expression,
-	   "-p"  : get_pid,
            "?" : help,
            "help" : help,
            "-h" : help,
@@ -322,15 +300,12 @@ commands = {"servo",
             "voice",
 	    "mouth",
 	    "listen",
-	    "pid",
-	    "move",
-	    "move_rel",
 }
 
 
 axises = {"1", "2"}
 
-colors = {"none", "red", "green", "blue"}
+colors = {"red", "green", "blue"}
 
 languages = {"english", "spanish"}
 
@@ -393,11 +368,11 @@ if len(sys.argv) == 1:
         line = ""
         while (1):
                 idx = 0
-	        print("Opening FIFO..." + FIFO_cmd)
-        	with open(FIFO_cmd) as fifo_cmd:
-                	print("FIFO opened" + FIFO_cmd)
-       	                line = fifo_cmd.read()
-			fifo_cmd.close()
+	        print("Opening FIFO...")
+        	with open(FIFO_cmd) as fifo:
+                	print("FIFO opened")
+       	                line = fifo.read()
+			fifo.close()
                	        if len(line) == 0:
                        	        print("Writer closed")
                                	continue
