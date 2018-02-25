@@ -122,13 +122,14 @@ void* inspect_PIPE_FIND_FACE(void *arg)
   char strTextToSend[1024];
   char listen_buff[1024];
   int nread, fd;
-  
+
+
   while (1) {
     sleep(1);
     memset(listen_buff, 0, 1024);
-    /* read text from the FIFO_FIND_FACE */
-    printf("opening %s\n", fifo_findFace);
     fd = open(fifo_findFace, O_RDONLY);
+    //printf("opening %s\n", fifo_findFace);
+    /* read text from the FIFO_FIND_FACE */
     nread = read(fd, listen_buff, 1024);
     if (nread > 0) {
 	printf ("From FIFO_FIND_FACE: %s\n", listen_buff);

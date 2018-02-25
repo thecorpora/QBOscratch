@@ -15,6 +15,8 @@ if [[ $1 = $START ]]; then
 	/home/pi/Documents/deamonsScripts/QBO_listen start
 	echo "starting feel.py..."
 	/home/pi/Documents/deamonsScripts/QBO_feel start
+	echo "starting findFace.py..."
+	/home/pi/Documents/deamonsScripts/QBO_findFace start
 fi
 
 if [[ $1 = $STOP ]];  then
@@ -29,5 +31,7 @@ if [[ $1 = $STOP ]];  then
         /home/pi/Documents/deamonsScripts/QBO_listen stop
         echo "stoping feel.py..."
         /home/pi/Documents/deamonsScripts/QBO_feel stop
+        echo "stoping findFace.py..."
+        /home/pi/Documents/deamonsScripts/QBO_findFace stop
 fi
 
