@@ -1,28 +1,28 @@
-# Control de QBO mediante Scrtachx
+# QBO control via Scrtachx
 
-## Para actualizar el control por Scratch:
+## To update the Scratch control:
 
-1. Clonar o descomprimir el repositorio sobre el directorio /home/pi/Documents
+1. Clone or unzip the repository over the **/home/pi/Documents** directory
 
-1. Ejecutar el script de inicio del control Scratch, para arrancar los 5 deamons necesarios:
+1. Run the Scratch control startup script, to boot the 5 deamons required:
 
 	`cd /home/pi/Documents/deamonsScripts`
 	 
 	`./QBO_scratch start` 
     
-    Para detener todos los procesos asociados al control Scratch:
+    To stop all processes associated with the Scratch control:
 	
 	`./QBO_scratch stop`
     
-    Para comprobar los procesos que se están ejecutando:
+    To check which processes are running:
 	
 	`./lsqbo`
     
-    Tiene que haber 5 procesos:  websocket_server, listen, say, PiCmd y feel
+    There must be 5 processes: websocket_server, listen, say, PiCmd and feel
 
-1. Abrir el navegador y entrar la siguiente dirección:
+1. Open the browser and enter the following address:
 
 	<http://scratchx.org/?url=https://thecorpora.github.io/QBOscratch/scratch_extension/robot_control.js#scratch>
 
-1. Desde la página de scratchx abrir el ejemplo `test_2.sbx`.  File->Load Project
+1. From scratchx page open the example test_2. sbx. File->Load Project
 
