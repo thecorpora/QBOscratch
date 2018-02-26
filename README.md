@@ -24,5 +24,5 @@
 
 	<http://scratchx.org/?url=https://thecorpora.github.io/QBOscratch/scratch_extension/robot_control.js#scratch>
 
-1. From scratchx page open the example test_2. sbx. File->Load Project
+1. From scratchx page open the example *test_2.sbx*    (File->Load Project)
 
