@@ -8,10 +8,16 @@ import pipes
 import json
 import apiai
 import time
+import yaml
 
 class QBOtalk:
     def __init__(self):
-        CLIENT_ACCESS_TOKEN = 'YOUR_APIAI_TOKEN'
+	config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
+
+        CLIENT_ACCESS_TOKEN = config["tokenAPIai"]
+	print "TOKEN: " + CLIENT_ACCESS_TOKEN
+#	You can enter your token in the next line
+#        CLIENT_ACCESS_TOKEN = 'YOUR_TOKEN'
         # obtain audio from the microphone
         self.r = sr.Recognizer()
         self.ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN)
@@ -48,7 +54,7 @@ class QBOtalk:
         return str_resp
     
     def SpeechText(self, text):
-        speak = "espeak -ven+f3 \"" + text + "\" --stdout  | aplay -D convertQBO &"
+        speak = "espeak -ven+f3 \"" + text + "\" --stdout  | aplay -D convertQBO"
         print "QBOtalk: " + speak
 	result = subprocess.call(speak, shell = True)
         print text
