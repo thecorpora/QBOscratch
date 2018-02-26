@@ -80,11 +80,11 @@ new (function() {
 	    
 	switch (direction) {
 	case 'up':
-	    position = parseInt(degrees / 0.29 + 550);
+	    position = parseInt(-degrees / 0.29 + 550);
 	    connection.send('-c servo -x 2 -a ' + position + ' -s ' + speed);
 	    break;
 	case 'down':
-	    position = parseInt(-degrees / 0.29 + 550);
+	    position = parseInt(degrees / 0.29 + 550);
 	    connection.send('-c servo -x 2 -a ' + position + ' -s ' + speed);
 	    break;
 	case 'left':
@@ -107,10 +107,10 @@ new (function() {
 
 	switch (direction) {
 	case 'up':
-	    connection.send('-c move_rel -x 2 -a ' + position);
+	    connection.send('-c move_rel -x 2 -a -' + position);
 	    break;
 	case 'down':
-	    connection.send('-c move_rel -x 2 -a -' + position);
+	    connection.send('-c move_rel -x 2 -a ' + position);
 	    break;
 	case 'left':
 	    connection.send('-c move_rel -x 1 -a -' + position);
