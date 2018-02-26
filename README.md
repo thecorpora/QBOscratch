@@ -23,3 +23,6 @@
 1. Abrir el navegador y entrar la siguiente dirección:
 
 	<http://scratchx.org/?url=https://thecorpora.github.io/QBOscratch/scratch_extension/robot_control.js#scratch>
+
+1. Desde la página de scratchx abrir el ejemplo `test_2.sbx`.  File->Load Project
+
