@@ -30,9 +30,9 @@ def SayFromFile():
 		        	speak = "espeak -v mb-es2 -s 120 \"" + data + "\" --stdout  | aplay -D convertQBO"
 		        print "Talk: " + speak
 			
-        		result = subprocess.call("../deamonsScripts/QBO_listen stop", shell = True)
+        		result = subprocess.call("/home/pi/Documents//deamonsScripts/QBO_listen stop", shell = True)
         		result = subprocess.call(speak, shell = True)
-        		result = subprocess.call("../deamonsScripts/QBO_listen start", shell = True)
+        		result = subprocess.call("/home/pi/Documents//deamonsScripts/QBO_listen start", shell = True)
 
 #============================================================================================================
 
