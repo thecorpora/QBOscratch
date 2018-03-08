@@ -2,6 +2,9 @@
 
 # NOTE: this example requires PyAudio because it uses the Microphone class
 
+# install TTs google
+# sudo pip install gTTS 
+
 import speech_recognition as sr
 import subprocess
 import pipes
@@ -9,6 +12,9 @@ import json
 import apiai
 import time
 import yaml
+import os
+import wave
+from gtts import gTTS
 
 class QBOtalk:
     def __init__(self):
@@ -25,6 +31,7 @@ class QBOtalk:
         self.GetResponse = False
         self.GetAudio = False
         self.strAudio = ""
+	self.config = config
         
         for i, mic_name in enumerate (sr.Microphone.list_microphone_names()):
             if(mic_name == "dmicQBO_sv"):
@@ -36,8 +43,10 @@ class QBOtalk:
         try:
             # print(r.recognize_google(audio,language="es-ES"))
 
-#            str = self.r.recognize_google(audio, language="es-ES")
-            str = self.r.recognize_google(audio)
+	    if (self.config["language"] == "spanish"):
+	            str = self.r.recognize_google(audio, language="es-ES")
+            else:
+		    str = self.r.recognize_google(audio)
 	    print "LISTEN: " + str
             request = self.ai.text_request()
 #	    request.lang = 'es'
@@ -52,12 +61,81 @@ class QBOtalk:
         except sr.RequestError as e:
             str_resp = "Could not request results from Speech Recognition service"
         return str_resp
-    
-    def SpeechText(self, text):
-        speak = "espeak -ven+f3 \"" + text + "\" --stdout  | aplay -D convertQBO"
+
+    def downsampleWav(self, src):
+	print "src: " + src
+        s_read = wave.open(src, 'r')
+	print "frameRate: " + s_read.getframerate()
+	s_read.setframerate(16000)
+	print "frameRate_2: " + s_read.getframerate()
+	return
+
+
+    def downsampleWave_2(self, src, dst, inrate, outrate, inchannels, outchannels):
+        if not os.path.exists(src):
+            print 'Source not found!'
+            return False
+
+        if not os.path.exists(os.path.dirname(dst)):
+	    print "dst: " + dst
+	    print "path: " + os.path.dirname(dst)
+            os.makedirs(os.path.dirname(dst))
+
+        try:
+            s_read = wave.open(src, 'r')
+            s_write = wave.open(dst, 'w')
+        except:
+            print 'Failed to open files!'
+            return False
+
+        n_frames = s_read.getnframes()
+        data = s_read.readframes(n_frames)
+
+        try:
+            converted = audioop.ratecv(data, 2, inchannels, inrate, outrate, None)
+            if outchannels == 1:
+                converted = audioop.tomono(converted[0], 2, 1, 0)
+        except:
+            print 'Failed to downsample wav'
+            return False
+
+        try:
+            s_write.setparams((outchannels, 2, outrate, 0, 'NONE', 'Uncompressed'))
+            s_write.writeframes(converted)
+        except:
+            print 'Failed to write wav'
+            return False
+
+        try:
+            s_read.close()
+            s_write.close()
+        except:
+            print 'Failed to close wav files'
+            return False
+
+        return True
+
+
+    def SpeechText(self, text_to_speech):
+	if (self.config["language"] == "Spanish"):
+		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+#		speak = "pico2wave -l \"es-ES\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
+	else:
+		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+#		speak = "pico2wave -l \"en-US\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
+
+#        speak = "espeak -ven+f3 \"" + text_to_speech + "\" --stdout  | aplay -D convertQBO"
+
+#	tts = gTTS(text = text_to_speech, lang = 'en')
+#	tts.save("/home/pi/Documents/say.wav")
+#	self.downsampleWav("/home/pi/Documents/say.wav")
+#	self.downsampleWav("./say.wav", "./say16.wav", 8000, 16000, 1, 1)
+#	downsampleWav("say.wav", "say16.wav")
+#	os.system("aplay -D convertQBO say16.wav")
+# hasta aqui
+
         print "QBOtalk: " + speak
 	result = subprocess.call(speak, shell = True)
-        print text
     
     def callback(self, recognizer, audio):
         try:

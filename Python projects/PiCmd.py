@@ -156,7 +156,7 @@ def get_color():
                 print "color param error"
 
 
-def get_languaje():
+def get_language():
         global lang
 
         try:
@@ -165,9 +165,9 @@ def get_languaje():
                 if arg in languages:
                         lang = arg
                 else:
-                        print "wrong languaje value"
+                        print "wrong language value"
         except:
-                print "laguaje param error"
+                print "laguage param error"
 
 def get_mouth_expression():
         global expression
@@ -217,7 +217,7 @@ def help():
         print "-x [axis] 1 or 2"
         print "-s [speed] from 1 to 2000"
         print "-co [color] none, red, green or blue"
-	print "-l [languaje] english or spanish"
+	print "-l [language] english or spanish"
 	print "-m [matrix] mouth leds matrix"
 	print "-e [expression] smile, sad or serious"
         print " "
@@ -271,8 +271,8 @@ def CommandOK_Action():
                 print "Saying: " + text
         elif cmd == "voice":
 		# actualizacion del fichero config
-                config["languaje"] = lang
-                with open('/home/pi/Documents/Python projects/config.yml', 'w') as f:
+                config["language"] = lang
+                with open('/home/pi/Documents/config.yml', 'w') as f:
                         yaml.dump(config, f)
                 print "Setting: " + cmd + " = " + str(lang)
                 f.close()
@@ -307,7 +307,7 @@ options = {"-c"  : get_command,
            "-s"  : get_speed,
            "-t"  : get_text,
            "-co" : get_color,
-           "-l"  : get_languaje,
+           "-l"  : get_language,
 	   "-m"  : get_mouth_matrix,
 	   "-e"  : get_mouth_expression,
 	   "-p"  : get_pid,
@@ -348,8 +348,8 @@ axis = 0
 speed = 0
 color = ""
 
-# fichero config, contiene languaje
-config = yaml.safe_load(open("/home/pi/Documents/Python projects/config.yml"))
+# fichero config, contiene language
+config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
 print "CONFIG " + str(config)
 
 # escanea los argumentos del ejecutable
