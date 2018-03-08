@@ -14,7 +14,7 @@ import time
 import yaml
 import os
 import wave
-from gtts import gTTS
+# from gtts import gTTS
 
 class QBOtalk:
     def __init__(self):
@@ -115,26 +115,40 @@ class QBOtalk:
 
         return True
 
-
     def SpeechText(self, text_to_speech):
-	if (self.config["language"] == "Spanish"):
-		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
-#		speak = "pico2wave -l \"es-ES\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
-	else:
-		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
-#		speak = "pico2wave -l \"en-US\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
+	self.config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
+	print "config:" + str(self.config)
+
+        if (self.config["language"] == "spanish"):
+                speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+#               speak = "pico2wave -l \"es-ES\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
+        else:
+                speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+#               speak = "pico2wave -l \"en-US\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
 
 #        speak = "espeak -ven+f3 \"" + text_to_speech + "\" --stdout  | aplay -D convertQBO"
 
-#	tts = gTTS(text = text_to_speech, lang = 'en')
-#	tts.save("/home/pi/Documents/say.wav")
-#	self.downsampleWav("/home/pi/Documents/say.wav")
-#	self.downsampleWav("./say.wav", "./say16.wav", 8000, 16000, 1, 1)
-#	downsampleWav("say.wav", "say16.wav")
-#	os.system("aplay -D convertQBO say16.wav")
+#       tts = gTTS(text = text_to_speech, lang = 'en')
+#       tts.save("/home/pi/Documents/say.wav")
+#       self.downsampleWav("/home/pi/Documents/say.wav")
+#       self.downsampleWav("./say.wav", "./say16.wav", 8000, 16000, 1, 1)
+#       downsampleWav("say.wav", "say16.wav")
+#       os.system("aplay -D convertQBO say16.wav")
 # hasta aqui
 
         print "QBOtalk: " + speak
+        result = subprocess.call(speak, shell = True)
+    
+
+    def SpeechText_2(self, text_to_speech, text_spain):
+	self.config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
+	print "config:" + str(self.config)
+	if (self.config["language"] == "spanish"):
+		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + text_spain + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+	else:
+		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+
+        print "QBOtalk_2: " + speak
 	result = subprocess.call(speak, shell = True)
     
     def callback(self, recognizer, audio):
