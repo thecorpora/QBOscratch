@@ -25,9 +25,9 @@ def SayFromFile():
  
 			print('Read: "{0}"'.format(data))
 		        if (config["language"] == "spanish"):
-                		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+                		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(config["volume"]) + "'>" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 		        else:
-                		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+                		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(config["volume"]) + "'>" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 
 			print "say.py: " + speak
 #

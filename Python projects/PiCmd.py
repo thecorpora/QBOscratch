@@ -270,6 +270,9 @@ def CommandOK_Action():
 #			fifo.close()
                 print "Saying: " + text
         elif cmd == "voice":
+		config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
+		print "CONFIG " + str(config)
+
 		# actualizacion del fichero config
                 config["language"] = lang
                 with open('/home/pi/Documents/config.yml', 'w') as f:
