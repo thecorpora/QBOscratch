@@ -21,18 +21,25 @@ def SayFromFile():
 		os.close(fifo)
 
 		if data:
-			config = yaml.safe_load(open("/home/pi/Documents/Python projects/config.yml"))
+			config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
  
 			print('Read: "{0}"'.format(data))
-	                if config["languaje"] == "english":
-		        	speak = "espeak -ven+f3 \"" + data + "\" --stdout  | aplay -D convertQBO"
-                	elif config["languaje"] == "spanish":
-		        	speak = "espeak -v mb-es2 -s 120 \"" + data + "\" --stdout  | aplay -D convertQBO"
-		        print "Talk: " + speak
+		        if (config["language"] == "spanish"):
+                		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+		        else:
+                		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+
+			print "say.py: " + speak
+#
+#	                if config["languaje"] == "english":
+#		        	speak = "espeak -ven+f3 \"" + data + "\" --stdout  | aplay -D convertQBO"
+#               	elif config["languaje"] == "spanish":
+#		        	speak = "espeak -v mb-es2 -s 120 \"" + data + "\" --stdout  | aplay -D convertQBO"
+		        print "say.py: " + speak
 			
-        		result = subprocess.call("/home/pi/Documents//deamonsScripts/QBO_listen stop", shell = True)
+        		result = subprocess.call("/home/pi/Documents/deamonsScripts/QBO_listen stop", shell = True)
         		result = subprocess.call(speak, shell = True)
-        		result = subprocess.call("/home/pi/Documents//deamonsScripts/QBO_listen start", shell = True)
+        		result = subprocess.call("/home/pi/Documents/deamonsScripts/QBO_listen start", shell = True)
 
 #============================================================================================================
 
