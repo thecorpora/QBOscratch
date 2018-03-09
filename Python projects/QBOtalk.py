@@ -120,10 +120,10 @@ class QBOtalk:
 	print "config:" + str(self.config)
 
         if (self.config["language"] == "spanish"):
-                speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+                speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(self.config["volume"]) + "'>" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 #               speak = "pico2wave -l \"es-ES\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
         else:
-                speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+                speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(self.config["volume"]) + "'>" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 #               speak = "pico2wave -l \"en-US\" -w /var/local/pico2wave.wav \"" + text_to_speech + "\" | aplay -D convertQBO"
 
 #        speak = "espeak -ven+f3 \"" + text_to_speech + "\" --stdout  | aplay -D convertQBO"
@@ -144,9 +144,9 @@ class QBOtalk:
 	self.config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
 	print "config:" + str(self.config)
 	if (self.config["language"] == "spanish"):
-		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"" + text_spain + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(self.config["volume"]) + "'>" + text_spain + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 	else:
-		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
+		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(self.config["volume"]) + "'>" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 
         print "QBOtalk_2: " + speak
 	result = subprocess.call(speak, shell = True)
@@ -164,8 +164,13 @@ class QBOtalk:
         print("callback listen")
         try:
             #strSpanish = self.r.recognize_google(audio,language="es-ES")
-	    with open("microphone-results.wav", "wb") as f:
-    		f.write(audio.get_wav_data())
+#	    with open("microphone-results.wav", "wb") as f:
+#    		f.write(audio.get_wav_data())
+            if (self.config["language"] == "spanish"):
+                    self.strAudio = self.r.recognize_google(audio, language="es-ES")
+            else:
+                    self.strAudio = self.r.recognize_google(audio)
+
             self.strAudio = self.r.recognize_google(audio)
 	    self.GetAudio = True
             print("listen: " + self.strAudio)
