@@ -136,7 +136,7 @@ class QBOtalk:
 #       os.system("aplay -D convertQBO say16.wav")
 # hasta aqui
 
-        print "QBOtalk: " + speak
+        print "QBOtalk: " + speak.encode('utf-8')
         result = subprocess.call(speak, shell = True)
     
 
@@ -148,7 +148,7 @@ class QBOtalk:
 	else:
 		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(self.config["volume"]) + "'>" + text_to_speech + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 
-        print "QBOtalk_2: " + speak
+        print "QBOtalk_2: " + speak.encode('utf-8')
 	result = subprocess.call(speak, shell = True)
     
     def callback(self, recognizer, audio):
