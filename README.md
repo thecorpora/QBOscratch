@@ -1,3 +1,7 @@
+# Qbo
+
+Qbo is an open-source Robot created by '''theCorpora''' which is excellent to implement basic SAR research, IoRT prototyping and STEM.
+
 # QBO control via Scrtachx
 
 ## To update the Scratch control:
@@ -25,4 +29,14 @@
 	<http://scratchx.org/?url=https://thecorpora.github.io/QBOscratch/scratch_extension/robot_control.js#scratch>
 
 1. From scratchx page open the example *test_2.sbx*    (File->Load Project)
+
+# QBo commands
+
+Once all the process are dead, you can do the following:
+
+* pico2wave -l "es-ES" -2 /home/pi/Documents/pico2wave.wav "La vida es muy compleja querido amigo" && aaplay -D convertQBO /home/pi/Documents/pico2wave.wav
+* python PiCmd.py -c say -t "Hola"
+* python PiCmd.py -c nose -co blue
+* python listen.py
+
 

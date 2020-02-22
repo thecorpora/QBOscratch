@@ -243,8 +243,8 @@ class Controller:
                 data = cmd.data_bytes[i]
 
             if data > 255:
-                tmp_buffer.append(data & 0xff)
-                tmp_buffer.append((data >> 8) & 0xff)
+                tmp_buffer.append(data[0] & 0xff)
+                tmp_buffer.append((data[0] >> 8) & 0xff)
             else :
                 tmp_buffer.append(data)
 
