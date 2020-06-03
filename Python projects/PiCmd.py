@@ -19,6 +19,8 @@ import pdb
 
 import QBOtalk
 
+import syslog
+
 
 cmd = ""
 angle = 0
@@ -65,8 +67,10 @@ def get_command():
                         cmd = str(arg)
                 else:
                         print "wrong command"
+                        syslog.syslog("wrong command")
         except:
                 print "command param error"
+                syslog.syslog("command param error")
 
 
 def get_angle():
@@ -78,8 +82,10 @@ def get_angle():
                         angle = int(arg)
                 else:
                         print "wrong angle value"
+                        syslog.syslog("wrong angle value")
         except:
                 print "wrong angle value"
+                syslog.syslog("wrong angle value")
 
 
 def get_text():
@@ -98,6 +104,7 @@ def get_text():
                         text += " " + arg
         except:
                 print "wrong text value"
+                syslog.syslog("wrong text value")
 
 def get_pid():
         global pid
@@ -117,7 +124,9 @@ def get_pid():
 			i += 1
         except:
                 print "wrong pid value"
+                syslog.syslog("wrong pid value")
 	print "PID: " + str(pid)
+	syslog.syslog("PID: " + str(pid))
 
 def get_axis():
         global axis
@@ -128,6 +137,7 @@ def get_axis():
                 axis = int(arg)
         else:
                 print "wrong axis value"
+                syslog.syslog("wrong axis value")
 
 def get_speed():
         global speed
@@ -139,8 +149,10 @@ def get_speed():
                         speed = int(arg)
                 else:
                         print "wrong speed value"
+                        syslog.syslog("wrong speed value")
         except:
                 print "wrong speed value"
+                syslog.syslog("wrong speed value")
 
 def get_color():
         global color
@@ -152,8 +164,10 @@ def get_color():
                         color = arg
                 else:
                         print "wrong color value"
+                        syslog.syslog("wrong color value")
         except:
                 print "color param error"
+                syslog.syslog("color param error")
 
 
 def get_language():
@@ -166,8 +180,10 @@ def get_language():
                         lang = arg
                 else:
                         print "wrong language value"
+                        syslog.syslog("wrong language value")
         except:
                 print "laguage param error"
+                syslog.syslog("laguage param error")
 
 def get_mouth_expression():
         global expression
@@ -179,8 +195,10 @@ def get_mouth_expression():
                         expression = arg
                 else:
                         print "wrong expression value"
+                        syslog.syslog("wrong expression value")
         except:
                 print "expression param error"
+                syslog.syslog("expression param error")
 
 
 def get_mouth_matrix():
@@ -188,18 +206,23 @@ def get_mouth_matrix():
 	global idx
 
 	print "GET_MOUTH_MATRIX"
+	syslog.syslog("GET_MOUTH_MATRIX")
 	print "idx: " + str(idx)
+	syslog.syslog("idx: " + str(idx))
 	try:
 		i = 0
 		while i<4:
 			arg = scan_argument(idx)
 			print "arg: " + arg
+			syslog.syslog("arg: " + arg)
 			matrix |= int(arg) << (8*(3-i))
 			print "arg matrix: " + str(matrix)
+			syslog.syslog("arg matrix: " + str(matrix))
 			i = i + 1
 			idx = idx + 1
 	except:
 		print "mouth matrix param error"
+		syslog.syslog("mouth matrix param error")
 
 
 def say():
@@ -241,13 +264,17 @@ def CommandOK_Action():
 
         if cmd == "servo" and angle != 0 and axis != 0 and speed >= 0:
                 print "Sending: " + cmd + "(" + str(axis) + "," + str(angle) + "," + str(speed) + ")"
+                syslog.syslog("Sending: " + cmd + "(" + str(axis) + "," + str(angle) + "," + str(speed) + ")")
 		HeadServo.SetServo(axis, angle, speed)
         elif cmd == "move" and angle != 0 and axis != 0:
+                syslog.syslog("Sending: " + cmd + "(" + str(axis) + "," + str(angle) + ")")
 		HeadServo.SetAngle(axis, angle)
         elif cmd == "move_rel" and angle != 0 and axis != 0:
+                syslog.syslog("Sending: " + cmd + "(" + str(axis) + "," + str(angle) + ")")
 		HeadServo.SetAngleRelative(axis, angle)
 	elif cmd == "nose" and color != "":
                 print "Sending: " + cmd + "(" + str(color) + ")"
+                syslog.syslog("Sending: " + cmd + "(" + str(color) + ")")
                 # se apaga el led de la nariz
                 # llamada al comando "nose"
                 if (color == "none"):
@@ -261,6 +288,7 @@ def CommandOK_Action():
         elif cmd == "say" and text != "":
 #		/* write "Hi" to the FIFO */
 	 	print("Opening FIFO..." + FIFO_say)
+	 	syslog.syslog("Opening FIFO..." + FIFO_say)
 		fifo_say = os.open(FIFO_say, os.O_WRONLY)
 		os.write(fifo_say, text)
 		os.close(fifo_say)
@@ -269,22 +297,27 @@ def CommandOK_Action():
 #			fifo.write(text)		
 #			fifo.close()
                 print "Saying: " + text
+                syslog.syslog("Saying: " + text)
         elif cmd == "voice":
 		config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
 		print "CONFIG " + str(config)
+		syslog.syslog("CONFIG " + str(config))
 
 		# actualizacion del fichero config
                 config["language"] = lang
                 with open('/home/pi/Documents/config.yml', 'w') as f:
                         yaml.dump(config, f)
                 print "Setting: " + cmd + " = " + str(lang)
+                syslog.syslog("Setting: " + cmd + " = " + str(lang))
                 f.close()
         elif cmd == "mouth":
 		if (matrix != 0):
 			print "Sending " + cmd + "(" + str(matrix) + ")"
+			syslog.syslog("Sending " + cmd + "(" + str(matrix) + ")")
 			HeadServo.SetMouth(matrix)
 		elif (expression != ""):
 			print "Sending " + cmd + "(" + expression + ")"
+			syslog.syslog("Sending " + cmd + "(" + expression + ")")
 			if expression == "smile":
 				HeadServo.SetMouth(0x110E00)
 			elif expression == "sad":
@@ -302,6 +335,7 @@ def CommandOK_Action():
 
 	else:
                 print "Command error. Type ? to help"
+                syslog.syslog("Command error. Type ? to help")
 
 
 options = {"-c"  : get_command,
@@ -339,6 +373,9 @@ languages = {"english", "spanish"}
 
 expressions = {"smile", "sad", "serious", "love"}
 
+# initialize syslog
+syslog.openlog("QBO_PiCmd")
+
 # start read key thread
 #thread.start_new_thread( dispach_UI,() )
 
@@ -368,10 +405,12 @@ try:
         # Open serial port
         ser = serial.Serial(port, baudrate=115200, bytesize = serial.EIGHTBITS, stopbits = serial.STOPBITS_ONE, parity = serial.PARITY_NONE, rtscts = False, dsrdtr =False, timeout = 0)
         print "Open serial port sucessfully."
+        syslog.syslog("Open serial port sucessfully.")
         print(ser.name)
         HeadServo = QboCmd.Controller(ser)
 except:
         print "Error opening serial port."
+        syslog.syslog("Error opening serial port.")
         sys.exit()
 
 # Qbo speak and voice recognition init.
@@ -397,14 +436,18 @@ if len(sys.argv) == 1:
         while (1):
                 idx = 0
 	        print("Opening FIFO..." + FIFO_cmd)
+	        syslog.syslog("Opening FIFO..." + FIFO_cmd)
         	with open(FIFO_cmd) as fifo_cmd:
                 	print("FIFO opened" + FIFO_cmd)
+                	syslog.syslog("FIFO opened" + FIFO_cmd)
        	                line = fifo_cmd.read()
 			fifo_cmd.close()
                	        if len(line) == 0:
                        	        print("Writer closed")
+                       	        syslog.syslog("Writer closed")
                                	continue
                        	print('line_cmd: ' + line)
+                       	syslog.syslog('line_cmd: ' + line)
 #                line = raw_input('QBO_>> ')
 
 			if (line == "exit" or line == "quit"):

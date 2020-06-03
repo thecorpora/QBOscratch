@@ -12,19 +12,22 @@ import sys
 import time
 import yaml
 import QBOtalk
+import syslog
 
 Qbo = QBOtalk.QBOtalk()
 
 Listening = True
 listen_thd = 0
 
+syslog.openlog("QBO_listen")
 
 def WaitForSpeech():
         global Listening, listen_thd, FIFO_listen, FIFO_cmd
 
-	print "WaitForSpeech: Listening=" + str(Listening) + "getAudio=" + str(Qbo.GetAudio)
+	print "WaitForSpeech: Listening=" + str(Listening) + " getAudio=" + str(Qbo.GetAudio)
         if Listening == False:
                 print "Listening = False"
+                syslog.syslog("Listening = False")
 		return
         elif Qbo.GetAudio == True:
 #                HeadServo.SetNoseColor(0)       #Off QBO nose brigth
@@ -33,6 +36,7 @@ def WaitForSpeech():
 #		os.close(fifo)
                 listen_thd(wait_for_stop = True)
                 print("Ha llegado algo al WaitForSpeech: " + Qbo.strAudio)
+                syslog.syslog("Something has arrived at WaitForSpeech: " + Qbo.strAudio)
 		fifo = os.open(FIFO_listen, os.O_WRONLY)
 		os.write(fifo, Qbo.strAudio)
 		os.close(fifo)
@@ -77,6 +81,7 @@ while True:
             # HeadServo.SetNoseColor(0)       #Off QBO nose brigth
             time.sleep(1)
             print("StartBackListen")
+            syslog.syslog("StartBackListen")
             try:
                 listen_thd = Qbo.StartBackListen()
 #                HeadServo.SetNoseColor(1)       # Set QBO nose green
@@ -86,6 +91,7 @@ while True:
                 Qbo.GetAudio = False
             except:
                 print("StartBackListe EXCEPTION")
+                syslog.syslog("StartBackListe EXCEPTION")
 
 	if Listening == False:
 		listen_thd = Qbo.StartBackListen()
