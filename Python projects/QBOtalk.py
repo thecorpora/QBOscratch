@@ -15,6 +15,9 @@ import yaml
 import os
 import wave
 # from gtts import gTTS
+import syslog
+
+syslog.openlog("QBOtalk")
 
 class QBOtalk:
     def __init__(self):
@@ -38,6 +41,7 @@ class QBOtalk:
                 self.m = sr.Microphone(i)
         with self.m as source:        
             self.r.adjust_for_ambient_noise(source)
+        syslog.syslog("init done.")
 
     def Decode(self, audio):
         try:
@@ -48,11 +52,13 @@ class QBOtalk:
             else:
 		    str = self.r.recognize_google(audio)
 	    print "LISTEN: " + str
+            syslog.syslog("LISTEN: " + str)
             request = self.ai.text_request()
 #	    request.lang = 'es'
             request.query = str
             response = request.getresponse()
             jsonresp = response.read()
+            syslog.syslog(jsonresp)
             data = json.loads(jsonresp)
             str_resp = data["result"]["fulfillment"]["speech"]
 
@@ -162,6 +168,7 @@ class QBOtalk:
         
     def callback_listen(self, recognizer, audio):
         print("callback listen")
+        syslog.syslog("callback listen")
         try:
             #strSpanish = self.r.recognize_google(audio,language="es-ES")
 #	    with open("microphone-results.wav", "wb") as f:
@@ -174,10 +181,12 @@ class QBOtalk:
             self.strAudio = self.r.recognize_google(audio)
 	    self.GetAudio = True
             print("listen: " + self.strAudio)
+            syslog.syslog("listen: " + self.strAudio)
             #print("listenSpanish: ", strSpanish)
             #self.SpeechText(self.Response)
         except:
             print("callback listen exception")
+            syslog.syslog("callback listen exception")
             self.strAudio = ""
             return
 
@@ -197,6 +206,7 @@ class QBOtalk:
             self.r.adjust_for_ambient_noise(source)
 
         print("start background listening")
+        syslog.syslog("start background listening")
 
         return self.r.listen_in_background(self.m, self.callback)
 
@@ -205,6 +215,7 @@ class QBOtalk:
             self.r.adjust_for_ambient_noise(source)
 
         print("start background only listening")
+        syslog.syslog("start background only listening")
 
         return self.r.listen_in_background(self.m, self.callback_listen)
 

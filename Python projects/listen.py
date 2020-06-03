@@ -70,6 +70,7 @@ listen_thd = Qbo.StartBackListen()
 #os.close(fifo)
 
 
+syslog.syslog("listen.py starting...")
 while True:
         time.sleep(1)
 	WaitForSpeech()
