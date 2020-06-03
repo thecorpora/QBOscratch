@@ -16,6 +16,8 @@ import os
 import wave
 # from gtts import gTTS
 import syslog
+from time import localtime, strftime
+import traceback
 
 syslog.openlog("QBOtalk")
 
@@ -158,6 +160,7 @@ class QBOtalk:
 	result = subprocess.call(speak, shell = True)
     
     def callback(self, recognizer, audio):
+        syslog.syslog("callback")
         try:
             self.Response = self.Decode(audio)
             self.GetResponse = True
@@ -171,8 +174,13 @@ class QBOtalk:
         syslog.syslog("callback listen")
         try:
             #strSpanish = self.r.recognize_google(audio,language="es-ES")
-#	    with open("microphone-results.wav", "wb") as f:
-#    		f.write(audio.get_wav_data())
+            if (self.config.has_key("listen_audio_dump") and self.config['listen_audio_dump']):
+                filename  = "/tmp/microphone-results-"
+                filename += strftime("%Y%m%d-%H%M%S", localtime())
+                filename += ".wav"
+    	        with open(filename, "wb") as f:
+    		    f.write(audio.get_wav_data())
+                    syslog.syslog("Dumped audio to " + filename)
             if (self.config["language"] == "spanish"):
                     self.strAudio = self.r.recognize_google(audio, language="es-ES")
             else:
@@ -184,10 +192,14 @@ class QBOtalk:
             syslog.syslog("listen: " + self.strAudio)
             #print("listenSpanish: ", strSpanish)
             #self.SpeechText(self.Response)
-        except:
+        except Exception as e:
             print("callback listen exception")
-            syslog.syslog("callback listen exception")
-            self.strAudio = ""
+            syslog.syslog("callback listen exception: " + str(e))
+            syslog.syslog(traceback.format_exc())
+            # If an error occured, give this back so the user can be notified 
+            # that we didn't understand the command
+            self.strAudio = "ERROR"
+	    self.GetAudio = True
             return
 
     def Start(self):
