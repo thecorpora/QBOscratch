@@ -11,6 +11,10 @@ import QboCmd
 import sys
 import time
 import yaml
+import syslog
+
+
+syslog.openlog("QBO_feel")
 
 port = '/dev/serial0'
 
@@ -20,6 +24,8 @@ try:
         ser = serial.Serial(port, baudrate=115200, bytesize = serial.EIGHTBITS, stopbits = serial.STOPBITS_ONE, parity = serial.PARITY_NONE, rtscts = False, dsrdtr =False, timeout = 0)
         print "Open serial port sucessfully."
         print(ser.name)
+        syslog.syslog("Open serial port sucessfully.")
+        syslog.syslog(ser.name)
 except:
         print "Error opening serial port."
         sys.exit()
@@ -33,10 +39,13 @@ def WaitForTouch():
         if touch:
                 if touch == [1]:
                     touch_str = "Touch: right"
+                    syslog.syslog("Touch right")
                 elif touch == [2]:
                     touch_str = "Touch: up"
+                    syslog.syslog("Touch up")
                 elif touch == [3]:
                     touch_str = "Touch: left"
+                    syslog.syslog("Touch left")
 
                 if touch == [1] or touch == [2] or touch == [3]:
 	                print(touch_str + "TO FIFO FEEL" )

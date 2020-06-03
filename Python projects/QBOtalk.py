@@ -15,6 +15,11 @@ import yaml
 import os
 import wave
 # from gtts import gTTS
+import syslog
+from time import localtime, strftime
+import traceback
+
+syslog.openlog("QBOtalk")
 
 class QBOtalk:
     def __init__(self):
@@ -38,6 +43,7 @@ class QBOtalk:
                 self.m = sr.Microphone(i)
         with self.m as source:        
             self.r.adjust_for_ambient_noise(source)
+        syslog.syslog("init done.")
 
     def Decode(self, audio):
         try:
@@ -48,11 +54,13 @@ class QBOtalk:
             else:
 		    str = self.r.recognize_google(audio)
 	    print "LISTEN: " + str
+            syslog.syslog("LISTEN: " + str)
             request = self.ai.text_request()
 #	    request.lang = 'es'
             request.query = str
             response = request.getresponse()
             jsonresp = response.read()
+            syslog.syslog(jsonresp)
             data = json.loads(jsonresp)
             str_resp = data["result"]["fulfillment"]["speech"]
 
@@ -152,6 +160,7 @@ class QBOtalk:
 	result = subprocess.call(speak, shell = True)
     
     def callback(self, recognizer, audio):
+        syslog.syslog("callback")
         try:
             self.Response = self.Decode(audio)
             self.GetResponse = True
@@ -162,10 +171,16 @@ class QBOtalk:
         
     def callback_listen(self, recognizer, audio):
         print("callback listen")
+        syslog.syslog("callback listen")
         try:
             #strSpanish = self.r.recognize_google(audio,language="es-ES")
-#	    with open("microphone-results.wav", "wb") as f:
-#    		f.write(audio.get_wav_data())
+            if (self.config.has_key("listen_audio_dump") and self.config['listen_audio_dump']):
+                filename  = "/tmp/microphone-results-"
+                filename += strftime("%Y%m%d-%H%M%S", localtime())
+                filename += ".wav"
+    	        with open(filename, "wb") as f:
+    		    f.write(audio.get_wav_data())
+                    syslog.syslog("Dumped audio to " + filename)
             if (self.config["language"] == "spanish"):
                     self.strAudio = self.r.recognize_google(audio, language="es-ES")
             else:
@@ -174,11 +189,17 @@ class QBOtalk:
             self.strAudio = self.r.recognize_google(audio)
 	    self.GetAudio = True
             print("listen: " + self.strAudio)
+            syslog.syslog("listen: " + self.strAudio)
             #print("listenSpanish: ", strSpanish)
             #self.SpeechText(self.Response)
-        except:
+        except Exception as e:
             print("callback listen exception")
-            self.strAudio = ""
+            syslog.syslog("callback listen exception: " + str(e))
+            syslog.syslog(traceback.format_exc())
+            # If an error occured, give this back so the user can be notified 
+            # that we didn't understand the command
+            self.strAudio = "ERROR"
+	    self.GetAudio = True
             return
 
     def Start(self):
@@ -197,6 +218,7 @@ class QBOtalk:
             self.r.adjust_for_ambient_noise(source)
 
         print("start background listening")
+        syslog.syslog("start background listening")
 
         return self.r.listen_in_background(self.m, self.callback)
 
@@ -205,6 +227,7 @@ class QBOtalk:
             self.r.adjust_for_ambient_noise(source)
 
         print("start background only listening")
+        syslog.syslog("start background only listening")
 
         return self.r.listen_in_background(self.m, self.callback_listen)
 

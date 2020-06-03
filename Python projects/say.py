@@ -11,10 +11,12 @@ import binascii
 import sys
 import time
 import yaml
+import syslog
 
 
 def SayFromFile():
 	print("Opening FIFO...")
+	syslog.syslog("Opening FIFO...")
     	while True:
 		fifo = os.open(FIFO_say, os.O_RDONLY)
 		data = os.read(fifo, 100)
@@ -24,18 +26,21 @@ def SayFromFile():
 			config = yaml.safe_load(open("/home/pi/Documents/config.yml"))
  
 			print('Read: "{0}"'.format(data))
+			syslog.syslog('Read: "{0}"'.format(data))
 		        if (config["language"] == "spanish"):
                 		speak = "pico2wave -l \"es-ES\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(config["volume"]) + "'>" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 		        else:
                 		speak = "pico2wave -l \"en-US\" -w /home/pi/Documents/pico2wave.wav \"<volume level='" + str(config["volume"]) + "'>" + data + "\" && aplay -D convertQBO /home/pi/Documents/pico2wave.wav"
 
 			print "say.py: " + speak
+			syslog.syslog("say.py: " + speak)
 #
 #	                if config["languaje"] == "english":
 #		        	speak = "espeak -ven+f3 \"" + data + "\" --stdout  | aplay -D convertQBO"
 #               	elif config["languaje"] == "spanish":
 #		        	speak = "espeak -v mb-es2 -s 120 \"" + data + "\" --stdout  | aplay -D convertQBO"
 		        print "say.py: " + speak
+		        syslog.syslog("say.py: " + speak)
 			
         		result = subprocess.call("/home/pi/Documents/deamonsScripts/QBO_listen stop", shell = True)
         		result = subprocess.call(speak, shell = True)
@@ -44,6 +49,7 @@ def SayFromFile():
 #============================================================================================================
 
 FIFO_say = '/home/pi/Documents/pipes/pipe_say'
+syslog.openlog("QBO_say")
 
 #
 #try:
