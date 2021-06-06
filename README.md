@@ -70,3 +70,5 @@ Como me habías comentado, las versiones profesionales de los programadores supe
 Buscando por Amazon de USA, lo encontré a USD 30 + tax.
 https://www.amazon.com/-/es/Segger-J-LINK-Mini-JTAG-Depurador/dp/B0758XRMTF/
 
+Paso a paso para actualizar el firmware: http://thecorpora.com/community/q-board-arduino/firmware-source-code-available-guide/
+
